@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// nest-prisma https://nestjs-prisma.dev/docs/installation/
+
+// migrate
+// https://www.prisma.io/docs/concepts/components/prisma-migrate
+// npx prisma migrate dev --name init
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  logs     Log[]
+  Profile  Profile?
+  roles    Role[]   @relation("RoleToUser")
+}
+
+model Profile {
+  id       Int      @id @default(autoincrement())
+  gender   Int
+  photo    String
+  address  String
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  userId   Int      @unique
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String
+  users User[] @relation("RoleToUser")
+}
+
+model Log {
+  id     Int    @id @default(autoincrement())
+  path   String
+  method String
+  data   String
+  result Int
+  userId Int?
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "Log_userId_fkey")
+}
