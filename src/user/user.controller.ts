@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Param,
   Post,
   Query,
@@ -11,14 +12,16 @@ import {
 import { UserService } from './user.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnum } from 'src/enum/config.enum';
-
 @Controller('user')
 export class UserController {
   // 使用 service 需要在 constructor 中定义一个变量
   constructor(
     private userService: UserService,
     private configService: ConfigService,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.log('UserController init success');
+  }
 
   @Get(':id')
   // @Query => /user?id=1&age=2
@@ -48,7 +51,9 @@ export class UserController {
     // if (!user.isAdmin) {
     //   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     // }
-
+    this.logger.log('请求用户成功了');
+    this.logger.warn('请求用户成功了');
+    this.logger.error('请求用户成功了');
     return this.userService.getUsers();
   }
 
