@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnum } from 'src/enum/config.enum';
@@ -33,6 +42,12 @@ export class UserController {
       '🚀 ~ file: user.controller.ts:27 ~ UserController ~ getUsers ~ host',
       host,
     );
+    // const user = {
+    //   isAdmin: false,
+    // };
+    // if (!user.isAdmin) {
+    //   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    // }
 
     return this.userService.getUsers();
   }
