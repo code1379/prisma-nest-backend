@@ -4,7 +4,9 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Inject,
   Logger,
+  LoggerService,
   Param,
   Post,
   Query,
@@ -12,13 +14,16 @@ import {
 import { UserService } from './user.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnum } from 'src/enum/config.enum';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 @Controller('user')
 export class UserController {
   // 使用 service 需要在 constructor 中定义一个变量
   constructor(
     private userService: UserService,
     private configService: ConfigService,
-    private readonly logger: Logger,
+    // private readonly logger: Logger,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {
     this.logger.log('UserController init success');
   }

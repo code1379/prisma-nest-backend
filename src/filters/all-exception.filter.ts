@@ -12,10 +12,14 @@ import {
 import { Request, Response } from 'express';
 import * as requestIp from 'request-ip';
 import { HttpAdapterHost } from '@nestjs/core';
+import { WinstonLogger } from 'nest-winston';
 // 不添加参数的话，会捕获所有异常。包括 websocket 的
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-  constructor(private httpAdapterHost: HttpAdapterHost) {}
+  constructor(
+    private httpAdapterHost: HttpAdapterHost,
+    private logger: WinstonLogger,
+  ) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const { httpAdapter } = this.httpAdapterHost;
     // host 用于获取上下文（express 的）
@@ -42,7 +46,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       exception: exception['name'],
       error: exception['response'] || 'INTERNAL_SERVER_ERROR',
     };
-
+    this.logger.error(exception['message'], exception['stack']);
     httpAdapter.reply(response, body, statusCode);
   }
 }
