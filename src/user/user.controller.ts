@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -8,6 +9,8 @@ import {
   Logger,
   LoggerService,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -15,6 +18,7 @@ import { UserService } from './user.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnum } from 'src/enum/config.enum';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { createUserDto, updateUserDto } from './create-user.dto';
 @Controller('user')
 export class UserController {
   // 使用 service 需要在 constructor 中定义一个变量
@@ -29,42 +33,34 @@ export class UserController {
   }
 
   @Get(':id')
-  // @Query => /user?id=1&age=2
-  // @Param => /user/1
-  getUsers(@Query() query: any, @Param() param: any): any {
-    console.log(
-      '🚀 ~ file: user.controller.ts:11 ~ UserController ~ getUsers ~ query',
-      query,
-    );
-    console.log(
-      '🚀 ~ file: user.controller.ts:13 ~ UserController ~ getUsers ~ param',
-      param,
-    );
-    const db = this.configService.get(ConfigEnum.DB);
-    const host = this.configService.get(ConfigEnum.DB_HOST);
-    console.log(
-      '🚀 ~ file: user.controller.ts:26 ~ UserController ~ getUsers ~ db',
-      db,
-    );
-    console.log(
-      '🚀 ~ file: user.controller.ts:27 ~ UserController ~ getUsers ~ host',
-      host,
-    );
-    // const user = {
-    //   isAdmin: false,
-    // };
-    // if (!user.isAdmin) {
-    //   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    // }
-    this.logger.log('请求用户成功了');
-    this.logger.warn('请求用户成功了');
-    this.logger.error('请求用户成功了');
+  // 参数内置管道
+  getUserById(@Param('id', ParseIntPipe) id: number): any {
+    return this.userService.getUserById(id);
+  }
+
+  @Get()
+  getUsers() {
     return this.userService.getUsers();
   }
 
   @Post()
-  addUser(@Body() dto: any): any {
-    console.log('dto', dto);
-    return this.userService.addUser();
+  // 通过管道的类验证器对参数进行验证
+  addUser(@Body() dto: createUserDto): any {
+    return this.userService.addUser(dto);
+  }
+
+  @Post('login')
+  login(@Body() dto: createUserDto): any {
+    return this.userService.login(dto);
+  }
+
+  @Delete()
+  deleteUserById(@Body('id', ParseIntPipe) id): any {
+    return this.userService.deleteUserById(id);
+  }
+
+  @Patch()
+  updateUserById(@Body() dto: updateUserDto) {
+    return this.userService.updateUserById(dto);
   }
 }
